@@ -1,0 +1,88 @@
+# =============================
+# Python / Django
+# =============================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Migrations (optional — keep if team)
+# backend/**/migrations/*.py
+# !backend/**/migrations/__init__.py
+
+# Static files (if using collectstatic)
+staticfiles/
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# =============================
+# PostgreSQL dumps
+# =============================
+
+*.sql
+
+# =============================
+# Node / Frontend
+# =============================
+
+node_modules/
+dist/
+.build/
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite
+frontend/.vite/
+
+# =============================
+# OS junk
+# =============================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================
+# VS Code / IDE
+# =============================
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =============================
+# Coverage & Test
+# =============================
+
+htmlcov/
+.coverage
+.pytest_cache/
+
+# =============================
+# Misc
+# =============================
+
+*.swp
+*.bak
+*.tmp

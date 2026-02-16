@@ -4,8 +4,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.db.models import Q
 from django.contrib.auth.models import User
+import logging
 
 from .services.exchange_service import place_order, cancel_order
+
+logger = logging.getLogger(__name__)
 from .services.orderbook import get_order_book
 from .serializers import (
     OrderSerializer,
@@ -17,6 +20,17 @@ from .serializers import (
 from .models import Order, Portfolio, Holding, Trade, Symbol
 from .channel_events import broadcast_orderbook
 from .services.market_data import fetch_candles
+
+
+class HealthCheckView(APIView):
+    """Health check endpoint for monitoring."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(
+            {"status": "ok", "service": "mini-exchange-api"},
+            status=status.HTTP_200_OK
+        )
 
 
 class RegisterView(APIView):
@@ -90,15 +104,29 @@ class OrderListCreateView(APIView):
         serializer = OrderCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         symbol_name = serializer.validated_data['symbol']
-        order = place_order(
-            user=request.user,
-            symbol_name=symbol_name,
-            side=serializer.validated_data['side'],
-            price=serializer.validated_data['price'],
-            quantity=serializer.validated_data['quantity'],
-        )
-        broadcast_orderbook(symbol_name)
-        return Response(OrderSerializer(order).data, status=201)
+        
+        try:
+            order = place_order(
+                user=request.user,
+                symbol_name=symbol_name,
+                side=serializer.validated_data['side'],
+                price=serializer.validated_data['price'],
+                quantity=serializer.validated_data['quantity'],
+            )
+            broadcast_orderbook(symbol_name)
+            return Response(OrderSerializer(order).data, status=201)
+        except ValueError as e:
+            logger.warning(f"Order placement failed for user {request.user}: {str(e)}")
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error placing order: {str(e)}", exc_info=True)
+            return Response(
+                {"detail": "An error occurred while placing the order."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class CancelOrderView(APIView):

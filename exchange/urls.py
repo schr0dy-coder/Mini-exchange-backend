@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    HealthCheckView,
     CandleView,
     OrderListCreateView,
     CancelOrderView,
@@ -9,10 +10,11 @@ from .views import (
     TradeListView,
     SymbolListView,
     RegisterView,
-    PricesView,
+    PricesView, 
 )
 
 urlpatterns = [
+    path('health/', HealthCheckView.as_view(), name='health_check'),
     path('register/', RegisterView.as_view(), name='register'),
     path('symbols/', SymbolListView.as_view(), name='symbol_list'),
     path('prices/', PricesView.as_view(), name='prices'),

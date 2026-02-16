@@ -40,4 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(seed_market_maker),
     ]

@@ -51,8 +51,8 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework',
     'corsheaders',
-    'exchange.apps.ExchangeConfig',
     'exchange',
+    'exchange.apps.ExchangeConfig',
 ]
 
 ASGI_APPLICATION = 'config.asgi.application'

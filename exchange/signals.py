@@ -15,4 +15,6 @@ def create_portfolio(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_portfolio(sender, instance, **kwargs):
-    instance.portfolio.save()
+    # Ensure portfolio exists and save it
+    portfolio, _ = Portfolio.objects.get_or_create(user=instance)
+    portfolio.save()

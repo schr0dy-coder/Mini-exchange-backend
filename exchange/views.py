@@ -58,7 +58,8 @@ class PortfolioView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        portfolio = Portfolio.objects.get(user=request.user)
+        # Use get_or_create to ensure portfolio exists
+        portfolio, _ = Portfolio.objects.get_or_create(user=request.user)
         return Response(PortfolioSerializer(portfolio).data)
 
 

@@ -2,6 +2,8 @@ from decimal import Decimal
 from django.db import transaction
 from exchange.models import Order, Portfolio, Trade, Symbol, Holding
 from exchange.services.matching_engine import match_order
+from exchange.services.price_fetch import fetch_symbol_price
+from django.utils import timezone
 from exchange.services.settlement import settle_trade
 
 
@@ -13,6 +15,17 @@ def place_order(user, symbol_name, side, price, quantity):
     symbol = Symbol.get_by_name(symbol_name)
     if symbol is None:
         raise ValueError(f"Symbol not found: {symbol_name!r}")
+
+    # Ensure we have a reasonably fresh market price for validation
+    # If symbol price is missing or older than 60 seconds, attempt a targeted fetch.
+    if not symbol.last_price or not symbol.last_price_updated_at or (timezone.now() - symbol.last_price_updated_at).total_seconds() > 60:
+        try:
+            fetched = fetch_symbol_price(symbol.name)
+            if fetched is not None:
+                # refresh symbol instance
+                symbol = Symbol.objects.get(pk=symbol.pk)
+        except Exception:
+            pass
 
     price = Decimal(str(price))
     quantity = int(quantity)

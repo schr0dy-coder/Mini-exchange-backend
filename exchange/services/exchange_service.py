@@ -4,6 +4,7 @@ from exchange.models import Order, Portfolio, Trade, Symbol, Holding
 from exchange.services.matching_engine import match_order
 from exchange.services.price_fetch import fetch_symbol_price
 from django.utils import timezone
+import logging
 from exchange.services.settlement import settle_trade
 
 
@@ -18,10 +19,12 @@ def place_order(user, symbol_name, side, price, quantity):
 
     # Ensure we have a reasonably fresh market price for validation
     # If symbol price is missing or older than 60 seconds, attempt a targeted fetch.
+    fetched = False
     if not symbol.last_price or not symbol.last_price_updated_at or (timezone.now() - symbol.last_price_updated_at).total_seconds() > 60:
         try:
-            fetched = fetch_symbol_price(symbol.name)
-            if fetched is not None:
+            fetched_val = fetch_symbol_price(symbol.name)
+            if fetched_val is not None:
+                fetched = True
                 # refresh symbol instance
                 symbol = Symbol.objects.get(pk=symbol.pk)
         except Exception:
@@ -41,6 +44,21 @@ def place_order(user, symbol_name, side, price, quantity):
 
         lower_limit = market_price * Decimal("0.90")
         upper_limit = market_price * Decimal("1.10")
+
+        # Log the market price and whether we fetched it just now
+        logger = logging.getLogger(__name__)
+        try:
+            logger.info(
+                "Price validation for user=%s symbol=%s price=%s market_price=%s fetched=%s last_update=%s",
+                getattr(user, 'username', str(user)),
+                symbol.name,
+                str(price),
+                str(market_price),
+                str(fetched),
+                getattr(symbol, 'last_price_updated_at', None),
+            )
+        except Exception:
+            pass
 
         if price < lower_limit or price > upper_limit:
             raise ValueError(

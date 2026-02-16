@@ -50,13 +50,43 @@ def fetch_symbol_price(symbol_name):
         return None
 
     from exchange.models import Symbol
+    import logging
+    logger = logging.getLogger(__name__)
     try:
         sym = Symbol.objects.filter(name__iexact=str(symbol_name).strip()).first()
         if not sym:
             return None
+
         ticker = yf.Ticker(sym.name)
-        info = ticker.info
-        price = info.get("regularMarketPrice") or info.get("previousClose") or info.get("open")
+
+        price = None
+
+        # 1) fast_info (preferred when available)
+        try:
+            fi = getattr(ticker, "fast_info", None)
+            if fi and isinstance(fi, dict):
+                price = fi.get("lastPrice") or fi.get("last_price")
+        except Exception:
+            pass
+
+        # 2) ticker.history fallback
+        if price is None:
+            try:
+                hist = ticker.history(period="1d", interval="1m")
+                if hasattr(hist, "empty") and not hist.empty:
+                    # Use the last close value
+                    price = hist["Close"].iloc[-1]
+            except Exception:
+                pass
+
+        # 3) ticker.info fallback (older yfinance versions)
+        if price is None:
+            try:
+                info = getattr(ticker, "info", None) or {}
+                price = info.get("regularMarketPrice") or info.get("previousClose") or info.get("open")
+            except Exception:
+                price = None
+
         if price is not None:
             from decimal import Decimal
             from django.utils import timezone
@@ -66,5 +96,6 @@ def fetch_symbol_price(symbol_name):
             sym.save(update_fields=["last_price", "last_price_updated_at"])
             return sym.last_price
     except Exception:
+        logger.exception("fetch_symbol_price failed for %s", symbol_name)
         return None
     return None

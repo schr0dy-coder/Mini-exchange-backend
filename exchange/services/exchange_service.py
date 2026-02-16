@@ -31,7 +31,9 @@ def place_order(user, symbol_name, side, price, quantity):
 
         if price < lower_limit or price > upper_limit:
             raise ValueError(
-                f"Order price must be within ±10% of market price ({market_price})."
+                f"Order price ${price:.2f} is outside valid range. "
+                f"Market price: ${market_price:.2f}. "
+                f"Valid range: ${lower_limit:.2f} - ${upper_limit:.2f}"
             )
     # =========================================
 

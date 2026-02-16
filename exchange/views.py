@@ -102,7 +102,13 @@ class OrderListCreateView(APIView):
 
     def post(self, request):
         serializer = OrderCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            logger.warning(f"Order validation failed for user {request.user}: {serializer.errors}")
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
         symbol_name = serializer.validated_data['symbol']
         
         try:

@@ -6,6 +6,7 @@ class ExchangeConfig(AppConfig):
     name = 'exchange'
 
     def ready(self):
+        import exchange.signals
         from .services.market_simulator import simulation_loop
         thread = Thread(target=simulation_loop)
         thread.daemon = True

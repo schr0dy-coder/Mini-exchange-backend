@@ -54,4 +54,5 @@ def settle_trade(trade):
     symbol.save(update_fields=["last_price", "last_price_updated_at"])
 
     # Broadcast after everything committed
+    broadcast_orderbook(symbol.name)
     broadcast_prices()

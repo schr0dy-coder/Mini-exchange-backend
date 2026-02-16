@@ -28,7 +28,7 @@ TWELVE_DATA_API_KEY = os.getenv('TWELVE_DATA_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ["mini-exchange-backend.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
     "https://mini-exchange-frontend-98ua.vercel.app",

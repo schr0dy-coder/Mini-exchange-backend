@@ -33,6 +33,16 @@ def seed_market_maker(apps, schema_editor):
         )
 
 
+def reverse_seed_market_maker(apps, schema_editor):
+    """Reverse: delete market_maker user and related data (optional)."""
+    User = apps.get_model("auth", "User")
+    try:
+        user = User.objects.get(username="market_maker")
+        user.delete()
+    except User.DoesNotExist:
+        pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -40,5 +50,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(seed_market_maker),
+        migrations.RunPython(seed_market_maker, reverse_seed_market_maker),
     ]

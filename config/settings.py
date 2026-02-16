@@ -101,21 +101,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 if os.environ.get("DATABASE_URL"):
     DATABASES = {
-        "default": dj_database_url.config(
-            conn_max_age=300,  # Close idle connections after 5 minutes
-            OPTIONS={
-                'connect_timeout': 10,
-                'options': '-c statement_timeout=30000',  # 30 second statement timeout
-                'pool': {
-                    'class': 'psycopg_pool.SimpleConnectionPool',
-                    'min_size': 2,
-                    'max_size': 5,
-                },
-            }
-        )
+        "default": dj_database_url.config(conn_max_age=300)
+    }
+    # Add PostgreSQL-specific connection options
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+        'options': '-c statement_timeout=30000',  # 30 second statement timeout
     }
     # Ensure connections are not held longer than necessary
-    DATABASES['default']['ATOMIC_REQUESTS'] = False
     DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 else:
     # Local SQLite fallback

@@ -9,7 +9,7 @@ def create_portfolio(sender, instance, created, **kwargs):
     if created:
         Portfolio.objects.create(
             user=instance,
-            available_balance=Decimal("10000000"),   # starting capital
+            available_balance=Decimal("100000"),   # starting capital
             reserved_balance=Decimal("0"),
         )
 

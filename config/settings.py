@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework',
     'corsheaders',
-    'exchange',
     'exchange.apps.ExchangeConfig',
 ]
 

@@ -13,10 +13,13 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -26,15 +29,30 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
 TWELVE_DATA_API_KEY = os.getenv('TWELVE_DATA_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ["*"]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "https://mini-exchange-frontend-98ua.vercel.app",
-# ]
-
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 
 
@@ -101,14 +119,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 if os.environ.get("DATABASE_URL"):
     DATABASES = {
-        "default": dj_database_url.config(conn_max_age=300)
+        "default": dj_database_url.config(
+            conn_max_age=0,
+            ssl_require=True
+        )
     }
-    # Add PostgreSQL-specific connection options
-    DATABASES['default']['OPTIONS'] = {
+    DATABASES['default'].setdefault('OPTIONS', {})
+    DATABASES['default']['OPTIONS'].update({
         'connect_timeout': 10,
-        'options': '-c statement_timeout=30000',  # 30 second statement timeout
-    }
-    # Ensure connections are not held longer than necessary
+    })
     DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 else:
     # Local SQLite fallback
@@ -166,8 +185,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -2,7 +2,7 @@
 
 > **A real-time simulated equity exchange and FIFO price-time matching engine built with Django, Channels (ASGI), and Supabase PostgreSQL.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-mini--exchange.vercel.app-brightgreen?style=for-the-badge&logo=vercel)](https://mini-exchange-frontend-98ua.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-mini--exchange.vercel.app-brightgreen?style=for-the-badge&logo=vercel)](https://mini-exchange-frontend-psi.vercel.app/)
 [![Backend](https://img.shields.io/badge/API-Render%20ASGI-46E3B7?style=for-the-badge&logo=render)](https://mini-exchange-backend.onrender.com/api/health/)
 [![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
